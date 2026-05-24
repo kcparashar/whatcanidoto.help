@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  ArrowUpRight,
   Banknote,
   BookOpen,
   CalendarDays,
@@ -807,7 +806,7 @@ export default function Home() {
         <div className="absolute inset-0 [background-image:linear-gradient(var(--grid-line)_1px,transparent_1px),linear-gradient(90deg,var(--grid-line)_1px,transparent_1px)] [background-size:36px_36px]" />
         <div className="relative mx-auto grid min-h-[92vh] max-w-7xl gap-6 px-4 py-5 sm:px-6 lg:grid-cols-[minmax(0,0.94fr)_minmax(360px,0.56fr)] lg:gap-8 lg:px-8">
           <div className="flex min-w-0 flex-col justify-between gap-6 lg:gap-8">
-            <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 sm:flex sm:flex-wrap sm:justify-between">
+            <header className="flex items-center justify-between gap-3">
               <a
                 className="inline-flex min-w-0 items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-[var(--page-contrast)] sm:text-sm sm:tracking-[0.24em]"
                 href="#top"
@@ -817,38 +816,29 @@ export default function Home() {
                 </span>
                 <span className="truncate">whatcanidoto.help</span>
               </a>
-              <div className="contents sm:flex sm:flex-wrap sm:items-center sm:gap-2">
-                <a
-                  className="col-span-2 row-start-2 inline-flex w-fit items-center gap-2 rounded-full border border-[color:var(--grid-line)] bg-[var(--control-muted)] px-3 py-2 text-sm font-bold shadow-sm transition hover:-translate-y-0.5 hover:bg-[var(--control)] sm:col-auto sm:row-auto sm:px-4"
-                  href="#actions"
-                >
-                  See actions
-                  <ArrowUpRight className="size-4" aria-hidden="true" />
-                </a>
-                <button
-                  aria-label={`Switch to ${isBlueprint ? "paper" : "blueprint"} theme`}
-                  aria-pressed={themePreference !== "system"}
-                  className="col-start-2 row-start-1 inline-flex size-8 shrink-0 items-center justify-center rounded-full border border-[color:var(--grid-line)] bg-[var(--control-muted)] text-[var(--page-contrast)] hover:bg-[var(--control)] sm:col-auto sm:row-auto"
-                  onClick={chooseTheme}
-                  title={
-                    themePreference === "system"
-                      ? `Following system theme: ${isBlueprint ? "blueprint" : "paper"}`
-                      : `Saved theme: ${isBlueprint ? "blueprint" : "paper"}`
-                  }
-                  type="button"
-                >
-                  {isBlueprint ? (
-                    <Sun className="size-4" aria-hidden="true" />
-                  ) : (
-                    <Moon className="size-4" aria-hidden="true" />
-                  )}
-                </button>
-              </div>
+              <button
+                aria-label={`Switch to ${isBlueprint ? "paper" : "blueprint"} theme`}
+                aria-pressed={themePreference !== "system"}
+                className="inline-flex size-8 shrink-0 items-center justify-center rounded-full border border-[color:var(--grid-line)] bg-[var(--control-muted)] text-[var(--page-contrast)] hover:bg-[var(--control)]"
+                onClick={chooseTheme}
+                title={
+                  themePreference === "system"
+                    ? `Following system theme: ${isBlueprint ? "blueprint" : "paper"}`
+                    : `Saved theme: ${isBlueprint ? "blueprint" : "paper"}`
+                }
+                type="button"
+              >
+                {isBlueprint ? (
+                  <Sun className="size-4" aria-hidden="true" />
+                ) : (
+                  <Moon className="size-4" aria-hidden="true" />
+                )}
+              </button>
             </header>
 
             <div id="top" className="max-w-4xl">
-              <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-[color:var(--grid-line)] bg-[var(--accent)] px-3 py-1 text-xs font-black uppercase tracking-[0.2em] text-[var(--accent-text)]">
-                <Sparkles className="size-3.5" aria-hidden="true" />
+              <p className="mb-4 inline-flex max-w-full items-center gap-1.5 whitespace-nowrap rounded-full border border-[color:var(--grid-line)] bg-[var(--accent)] px-2.5 py-1 text-[0.625rem] font-black uppercase tracking-[0.09em] text-[var(--accent-text)] sm:gap-2 sm:px-3 sm:text-xs sm:tracking-[0.2em]">
+                <Sparkles className="size-3 shrink-0 sm:size-3.5" aria-hidden="true" />
                 Turn emotional energy into action
               </p>
               <h1 className="max-w-3xl text-balance text-[2.55rem] font-black leading-[0.94] tracking-normal text-[var(--ink)] sm:text-6xl lg:text-7xl">
