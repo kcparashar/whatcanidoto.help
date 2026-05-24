@@ -16,6 +16,8 @@ The product is intentionally lightweight: no accounts, no database, no live nonp
 - Recommended “best next step” plus grouped action cards
 - Trust and safety notes for donations, volunteering, crisis response, and sharing
 - Paper and blueprint dark-mode visual themes
+- System-aware theme preference with cookie persistence after manual selection
+- Custom favicon and social share metadata for rich link previews
 
 ## Tech Stack
 

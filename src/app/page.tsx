@@ -30,12 +30,14 @@ import {
   Utensils,
   Wrench,
 } from "lucide-react";
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type Offer = "time" | "money" | "skills" | "local" | "voice" | "not-sure";
 type Effort = "10-min" | "1-hour" | "weekend" | "ongoing";
 type Goal = "any" | "learn" | "donate" | "volunteer" | "advocate" | "skills" | "habit";
 type Energy = "overwhelmed" | "angry" | "heartbroken" | "urgent" | "steady";
+type ThemePreference = "system" | "paper" | "blueprint";
+type ResolvedTheme = "paper" | "blueprint";
 type ActionKind =
   | "Donate"
   | "Volunteer"
@@ -62,56 +64,6 @@ type Cause = {
   summary: string;
   icon: React.ComponentType<{ className?: string }>;
   actions: Action[];
-};
-
-type ThemeVars = CSSProperties & Record<`--${string}`, string>;
-
-const paperTheme: ThemeVars = {
-  "--page": "#f7f2e8",
-  "--page-contrast": "#1f241f",
-  "--hero-gradient": "linear-gradient(135deg,#f7f2e8 0%,#fffaf0 48%,#d7efe4 100%)",
-  "--grid-line": "rgba(31,36,31,0.1)",
-  "--ink": "#172016",
-  "--muted": "#596156",
-  "--copy": "#384237",
-  "--soft": "rgba(255,250,240,0.85)",
-  "--panel": "#ffffff",
-  "--panel-tint": "#d7efe4",
-  "--control": "#ffffff",
-  "--control-muted": "rgba(255,255,255,0.7)",
-  "--primary": "#1f241f",
-  "--primary-soft": "rgba(31,36,31,0.07)",
-  "--primary-text": "#ffffff",
-  "--accent": "#ffcf5a",
-  "--accent-text": "#1f241f",
-  "--accent-panel": "rgba(255,255,255,0.82)",
-  "--signal": "#e15f41",
-  "--shadow": "0 24px 80px rgba(31,36,31,0.12)",
-  "--heavy-shadow": "6px 6px 0 #1f241f",
-};
-
-const blueprintTheme: ThemeVars = {
-  "--page": "#061733",
-  "--page-contrast": "#dff8ff",
-  "--hero-gradient": "linear-gradient(135deg,#061733 0%,#092a55 50%,#0b3a70 100%)",
-  "--grid-line": "rgba(121,220,255,0.24)",
-  "--ink": "#f4fdff",
-  "--muted": "#9ed4e8",
-  "--copy": "#c6eefe",
-  "--soft": "rgba(7,31,61,0.86)",
-  "--panel": "#071f3d",
-  "--panel-tint": "#0d3a68",
-  "--control": "#08284f",
-  "--control-muted": "rgba(9,48,92,0.78)",
-  "--primary": "#021126",
-  "--primary-soft": "rgba(126,223,255,0.12)",
-  "--primary-text": "#e9fbff",
-  "--accent": "#63d9ff",
-  "--accent-text": "#031426",
-  "--accent-panel": "rgba(233,251,255,0.82)",
-  "--signal": "#8af4ff",
-  "--shadow": "0 24px 90px rgba(0,0,0,0.32)",
-  "--heavy-shadow": "6px 6px 0 #63d9ff",
 };
 
 const effortLabels: Record<Effort, string> = {
@@ -204,6 +156,30 @@ const energyOptions: {
     efforts: ["weekend", "ongoing"],
   },
 ];
+
+const THEME_COOKIE = "whatcanidoto-theme";
+const THEME_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
+
+function readThemeCookie(): ThemePreference {
+  if (typeof document === "undefined") {
+    return "system";
+  }
+
+  const cookie = document.cookie
+    .split("; ")
+    .find((entry) => entry.startsWith(`${THEME_COOKIE}=`))
+    ?.split("=")[1];
+
+  return cookie === "paper" || cookie === "blueprint" ? cookie : "system";
+}
+
+function writeThemeCookie(theme: ResolvedTheme) {
+  document.cookie = `${THEME_COOKIE}=${theme}; Max-Age=${THEME_COOKIE_MAX_AGE}; Path=/; SameSite=Lax`;
+}
+
+function resolveSystemTheme(): ResolvedTheme {
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "blueprint" : "paper";
+}
 
 const causes: Cause[] = [
   {
@@ -718,7 +694,8 @@ export default function Home() {
   const [selectedEffort, setSelectedEffort] = useState<Effort | "any">("any");
   const [selectedGoal, setSelectedGoal] = useState<Goal>("any");
   const [selectedEnergy, setSelectedEnergy] = useState<Energy>("overwhelmed");
-  const [isBlueprint, setIsBlueprint] = useState(false);
+  const [themePreference, setThemePreference] = useState<ThemePreference>(() => readThemeCookie());
+  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>("paper");
 
   const trimmedQuery = query.trim().toLowerCase();
   const queryTokens = trimmedQuery.split(/\s+/).filter((token) => token.length > 2);
@@ -775,11 +752,36 @@ export default function Home() {
   const CauseIcon = selectedCause.icon;
   const selectedEnergyOption = energyOptions.find((energy) => energy.id === selectedEnergy) ?? energyOptions[0];
   const selectedGoalLabel = goalOptions.find((goal) => goal.id === selectedGoal)?.label ?? "Pick for me";
-  const themeVars = isBlueprint ? blueprintTheme : paperTheme;
+  const isBlueprint = resolvedTheme === "blueprint";
 
   useEffect(() => {
-    document.documentElement.dataset.theme = isBlueprint ? "blueprint" : "paper";
-  }, [isBlueprint]);
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+    function applyTheme() {
+      const nextTheme = themePreference === "system" ? resolveSystemTheme() : themePreference;
+
+      setResolvedTheme(nextTheme);
+      document.documentElement.dataset.theme = nextTheme;
+      document.documentElement.style.colorScheme = nextTheme === "blueprint" ? "dark" : "light";
+    }
+
+    applyTheme();
+
+    if (themePreference !== "system") {
+      return undefined;
+    }
+
+    mediaQuery.addEventListener("change", applyTheme);
+
+    return () => mediaQuery.removeEventListener("change", applyTheme);
+  }, [themePreference]);
+
+  function chooseTheme() {
+    const nextTheme = resolvedTheme === "blueprint" ? "paper" : "blueprint";
+
+    setThemePreference(nextTheme);
+    writeThemeCookie(nextTheme);
+  }
 
   function toggleOffer(offer: Offer) {
     setSelectedOffers((current) => {
@@ -799,14 +801,35 @@ export default function Home() {
   return (
     <main
       className="min-h-screen overflow-x-hidden bg-[var(--page)] text-[var(--page-contrast)] transition-colors duration-300"
-      data-theme={isBlueprint ? "blueprint" : "paper"}
-      style={themeVars}
+      data-theme={resolvedTheme}
     >
+      <button
+        aria-label={`Switch to ${isBlueprint ? "paper" : "blueprint"} theme`}
+        aria-pressed={themePreference !== "system"}
+        className="fixed right-[max(1rem,env(safe-area-inset-right))] top-[max(1rem,env(safe-area-inset-top))] z-50 inline-flex size-11 items-center justify-center gap-2 rounded-full border border-[color:var(--grid-line)] bg-[var(--control-muted)] font-black text-[var(--page-contrast)] shadow-[var(--shadow)] backdrop-blur sm:size-auto sm:px-4 sm:py-2 sm:text-sm"
+        onClick={chooseTheme}
+        title={
+          themePreference === "system"
+            ? `Following system theme: ${isBlueprint ? "blueprint" : "paper"}`
+            : `Saved theme: ${isBlueprint ? "blueprint" : "paper"}`
+        }
+        type="button"
+      >
+        {isBlueprint ? (
+          <Sun className="size-4" aria-hidden="true" />
+        ) : (
+          <Moon className="size-4" aria-hidden="true" />
+        )}
+        <span className="hidden sm:inline">
+          {themePreference === "system" ? "System" : isBlueprint ? "Blueprint" : "Paper"}
+        </span>
+      </button>
+
       <section className="relative overflow-hidden border-b border-[color:var(--grid-line)] [background:var(--hero-gradient)]">
         <div className="absolute inset-0 [background-image:linear-gradient(var(--grid-line)_1px,transparent_1px),linear-gradient(90deg,var(--grid-line)_1px,transparent_1px)] [background-size:36px_36px]" />
         <div className="relative mx-auto grid min-h-[92vh] max-w-7xl gap-6 px-4 py-5 sm:px-6 lg:grid-cols-[minmax(0,0.94fr)_minmax(360px,0.56fr)] lg:gap-8 lg:px-8">
           <div className="flex min-w-0 flex-col justify-between gap-6 lg:gap-8">
-            <header className="flex flex-wrap items-center justify-between gap-3">
+            <header className="flex flex-wrap items-center justify-between gap-3 pr-14 sm:pr-36">
               <a
                 className="inline-flex items-center gap-2 text-sm font-black uppercase tracking-[0.24em] text-[var(--page-contrast)]"
                 href="#top"
@@ -817,19 +840,6 @@ export default function Home() {
                 whatcanidoto.help
               </a>
               <div className="flex flex-wrap items-center gap-2">
-                <button
-                  aria-pressed={isBlueprint}
-                  className="inline-flex items-center gap-2 rounded-full border border-[color:var(--grid-line)] bg-[var(--control-muted)] px-4 py-2 text-sm font-bold shadow-sm transition hover:-translate-y-0.5 hover:bg-[var(--control)]"
-                  onClick={() => setIsBlueprint((current) => !current)}
-                  type="button"
-                >
-                  {isBlueprint ? (
-                    <Sun className="size-4" aria-hidden="true" />
-                  ) : (
-                    <Moon className="size-4" aria-hidden="true" />
-                  )}
-                  {isBlueprint ? "Paper" : "Blueprint"}
-                </button>
                 <a
                   className="inline-flex items-center gap-2 rounded-full border border-[color:var(--grid-line)] bg-[var(--control-muted)] px-4 py-2 text-sm font-bold shadow-sm transition hover:-translate-y-0.5 hover:bg-[var(--control)]"
                   href="#actions"
