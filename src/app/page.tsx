@@ -8,8 +8,12 @@ import {
   CheckCircle2,
   Clock3,
   Compass,
+  Flame,
+  Globe2,
   GraduationCap,
+  HandHeart,
   HeartHandshake,
+  HeartPulse,
   House,
   Landmark,
   Leaf,
@@ -30,6 +34,8 @@ import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
 type Offer = "time" | "money" | "skills" | "local" | "voice" | "not-sure";
 type Effort = "10-min" | "1-hour" | "weekend" | "ongoing";
+type Goal = "any" | "learn" | "donate" | "volunteer" | "advocate" | "skills" | "habit";
+type Energy = "overwhelmed" | "angry" | "heartbroken" | "urgent" | "steady";
 type ActionKind =
   | "Donate"
   | "Volunteer"
@@ -132,6 +138,71 @@ const effortOptions: { id: Effort | "any"; label: string }[] = [
   { id: "1-hour", label: "1 hour" },
   { id: "weekend", label: "Weekend" },
   { id: "ongoing", label: "Ongoing" },
+];
+
+const goalOptions: {
+  id: Goal;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  actionKinds: ActionKind[];
+}[] = [
+  { id: "any", label: "Pick for me", icon: Sparkles, actionKinds: [] },
+  { id: "learn", label: "Learn", icon: BookOpen, actionKinds: ["Learn"] },
+  { id: "donate", label: "Give money", icon: Banknote, actionKinds: ["Donate"] },
+  { id: "volunteer", label: "Volunteer", icon: Users, actionKinds: ["Volunteer"] },
+  { id: "advocate", label: "Use my voice", icon: Megaphone, actionKinds: ["Advocate", "Share"] },
+  { id: "skills", label: "Use skills", icon: Wrench, actionKinds: ["Skill"] },
+  { id: "habit", label: "Build habit", icon: CalendarDays, actionKinds: ["Prepare"] },
+];
+
+const energyOptions: {
+  id: Energy;
+  label: string;
+  description: string;
+  icon: React.ComponentType<{ className?: string }>;
+  actionKinds: ActionKind[];
+  efforts: Effort[];
+}[] = [
+  {
+    id: "overwhelmed",
+    label: "Overwhelmed",
+    description: "Give me one small, real step.",
+    icon: Compass,
+    actionKinds: ["Learn", "Prepare"],
+    efforts: ["10-min"],
+  },
+  {
+    id: "angry",
+    label: "Angry",
+    description: "Turn heat into pressure.",
+    icon: Flame,
+    actionKinds: ["Advocate", "Share"],
+    efforts: ["10-min", "1-hour"],
+  },
+  {
+    id: "heartbroken",
+    label: "Heartbroken",
+    description: "Do something caring.",
+    icon: HeartPulse,
+    actionKinds: ["Donate", "Volunteer"],
+    efforts: ["10-min", "weekend"],
+  },
+  {
+    id: "urgent",
+    label: "Urgent",
+    description: "Act fast without making noise.",
+    icon: Siren,
+    actionKinds: ["Donate", "Share", "Volunteer"],
+    efforts: ["10-min", "1-hour"],
+  },
+  {
+    id: "steady",
+    label: "Ready",
+    description: "Build a repeatable commitment.",
+    icon: HandHeart,
+    actionKinds: ["Skill", "Prepare", "Volunteer"],
+    efforts: ["weekend", "ongoing"],
+  },
 ];
 
 const causes: Cause[] = [
@@ -315,6 +386,62 @@ const causes: Cause[] = [
         offers: ["time", "local", "skills"],
         why: "Prepared volunteers are more useful and safer than spontaneous ones.",
         firstStep: "Look up CERT, Red Cross, medical reserve, or local emergency volunteer training in your county.",
+      },
+    ],
+  },
+  {
+    id: "humanitarian",
+    name: "War and humanitarian crises",
+    summary: "Support civilians, displaced people, and relief efforts without amplifying panic or misinformation.",
+    icon: Globe2,
+    actions: [
+      {
+        title: "Verify before you share",
+        effort: "10-min",
+        kind: "Learn",
+        mode: "Remote",
+        offers: ["time", "voice", "not-sure"],
+        why: "In fast-moving conflicts, old footage and false claims spread quickly and can put people at risk.",
+        firstStep: "Check the date, location, original source, and whether a trusted humanitarian or newsroom source confirms the claim.",
+        trustNote: "Avoid reposting graphic images, private details, or donation links that cannot be traced to a real organization.",
+      },
+      {
+        title: "Give to civilian relief through a clear channel",
+        effort: "10-min",
+        kind: "Donate",
+        mode: "Remote",
+        offers: ["money"],
+        why: "Flexible cash helps vetted responders buy what people need close to where they are.",
+        firstStep: "Choose a humanitarian fund with named local partners, a current response page, and a normal donation URL.",
+        trustNote: "Be careful with payment handles in screenshots, urgent DMs, or posts that hide who receives the money.",
+      },
+      {
+        title: "Ask your representative for a specific civilian-protection action",
+        effort: "1-hour",
+        kind: "Advocate",
+        mode: "Remote",
+        offers: ["voice", "time"],
+        why: "Public offices track calls and messages, especially when requests are concrete and tied to pending decisions.",
+        firstStep: "Write a three-sentence message asking for humanitarian access, civilian protection, refugee support, or a specific aid vote.",
+      },
+      {
+        title: "Support refugees or displaced families near you",
+        effort: "weekend",
+        kind: "Volunteer",
+        mode: "Local",
+        offers: ["time", "local", "skills"],
+        why: "Conflict often becomes local through resettlement, translation, legal support, school enrollment, and basic logistics.",
+        firstStep: "Search your city plus refugee resettlement, immigration legal aid, language support, or community sponsorship.",
+        trustNote: "Work through groups with privacy rules and clear volunteer screening.",
+      },
+      {
+        title: "Offer a skill that lowers the workload",
+        effort: "ongoing",
+        kind: "Skill",
+        mode: "Either",
+        offers: ["skills"],
+        why: "Translation, design, fundraising operations, data cleanup, and intake support can make small organizations more effective.",
+        firstStep: "Send one bounded offer: your skill, your weekly time limit, and one task you can complete without needing much supervision.",
       },
     ],
   },
@@ -565,15 +692,45 @@ function actionScore(action: Action, selectedOffers: Offer[]) {
   return action.offers.filter((offer) => selectedOffers.includes(offer)).length;
 }
 
+function actionMatchesGoal(action: Action, goal: Goal) {
+  const goalOption = goalOptions.find((option) => option.id === goal);
+
+  return !goalOption || goalOption.actionKinds.length === 0 || goalOption.actionKinds.includes(action.kind);
+}
+
+function emotionalScore(action: Action, energy: Energy) {
+  const energyOption = energyOptions.find((option) => option.id === energy);
+
+  if (!energyOption) {
+    return 0;
+  }
+
+  const kindScore = energyOption.actionKinds.includes(action.kind) ? 2 : 0;
+  const effortScore = energyOption.efforts.includes(action.effort) ? 1 : 0;
+
+  return kindScore + effortScore;
+}
+
 export default function Home() {
   const [query, setQuery] = useState("");
   const [selectedCauseId, setSelectedCauseId] = useState(causes[0].id);
   const [selectedOffers, setSelectedOffers] = useState<Offer[]>(["not-sure"]);
   const [selectedEffort, setSelectedEffort] = useState<Effort | "any">("any");
+  const [selectedGoal, setSelectedGoal] = useState<Goal>("any");
+  const [selectedEnergy, setSelectedEnergy] = useState<Energy>("overwhelmed");
   const [isBlueprint, setIsBlueprint] = useState(false);
 
   const trimmedQuery = query.trim().toLowerCase();
-  const searchedCause = causes.find((cause) => cause.name.toLowerCase().includes(trimmedQuery));
+  const queryTokens = trimmedQuery.split(/\s+/).filter((token) => token.length > 2);
+  const searchedCause = causes.find((cause) => {
+    const searchableCause = `${cause.name} ${cause.summary}`.toLowerCase();
+    const searchableWords = new Set(searchableCause.match(/[a-z0-9]+/g) ?? []);
+
+    return (
+      (trimmedQuery.length > 3 && searchableCause.includes(trimmedQuery)) ||
+      queryTokens.some((token) => searchableWords.has(token))
+    );
+  });
   const selectedCause = useMemo(() => {
     if (trimmedQuery) {
       return searchedCause ?? createFallbackCause(query);
@@ -583,10 +740,20 @@ export default function Home() {
   }, [query, searchedCause, selectedCauseId, trimmedQuery]);
 
   const filteredActions = useMemo(() => {
-    return selectedCause.actions
+    const capacityFiltered = selectedCause.actions
       .filter((action) => selectedEffort === "any" || action.effort === selectedEffort)
-      .filter((action) => selectedOffers.includes("not-sure") || actionScore(action, selectedOffers) > 0)
+      .filter((action) => selectedOffers.includes("not-sure") || actionScore(action, selectedOffers) > 0);
+    const goalFiltered = capacityFiltered.filter((action) => actionMatchesGoal(action, selectedGoal));
+    const actions = goalFiltered.length > 0 ? goalFiltered : capacityFiltered;
+
+    return actions
       .sort((a, b) => {
+        const emotionalDifference = emotionalScore(b, selectedEnergy) - emotionalScore(a, selectedEnergy);
+
+        if (emotionalDifference !== 0) {
+          return emotionalDifference;
+        }
+
         const scoreDifference = actionScore(b, selectedOffers) - actionScore(a, selectedOffers);
 
         if (scoreDifference !== 0) {
@@ -595,7 +762,7 @@ export default function Home() {
 
         return effortOrder.indexOf(a.effort) - effortOrder.indexOf(b.effort);
       });
-  }, [selectedCause.actions, selectedEffort, selectedOffers]);
+  }, [selectedCause.actions, selectedEffort, selectedEnergy, selectedGoal, selectedOffers]);
 
   const recommendedAction = filteredActions[0] ?? selectedCause.actions[0];
   const groupedActions = effortOrder
@@ -606,6 +773,8 @@ export default function Home() {
     .filter((group) => group.actions.length > 0);
 
   const CauseIcon = selectedCause.icon;
+  const selectedEnergyOption = energyOptions.find((energy) => energy.id === selectedEnergy) ?? energyOptions[0];
+  const selectedGoalLabel = goalOptions.find((goal) => goal.id === selectedGoal)?.label ?? "Pick for me";
   const themeVars = isBlueprint ? blueprintTheme : paperTheme;
 
   useEffect(() => {
@@ -629,14 +798,14 @@ export default function Home() {
 
   return (
     <main
-      className="min-h-screen bg-[var(--page)] text-[var(--page-contrast)] transition-colors duration-300"
+      className="min-h-screen overflow-x-hidden bg-[var(--page)] text-[var(--page-contrast)] transition-colors duration-300"
       data-theme={isBlueprint ? "blueprint" : "paper"}
       style={themeVars}
     >
       <section className="relative overflow-hidden border-b border-[color:var(--grid-line)] [background:var(--hero-gradient)]">
         <div className="absolute inset-0 [background-image:linear-gradient(var(--grid-line)_1px,transparent_1px),linear-gradient(90deg,var(--grid-line)_1px,transparent_1px)] [background-size:36px_36px]" />
-        <div className="relative mx-auto grid min-h-[92vh] max-w-7xl gap-8 px-4 py-5 sm:px-6 lg:grid-cols-[minmax(0,0.94fr)_minmax(360px,0.56fr)] lg:px-8">
-          <div className="flex flex-col justify-between gap-8">
+        <div className="relative mx-auto grid min-h-[92vh] max-w-7xl gap-6 px-4 py-5 sm:px-6 lg:grid-cols-[minmax(0,0.94fr)_minmax(360px,0.56fr)] lg:gap-8 lg:px-8">
+          <div className="flex min-w-0 flex-col justify-between gap-6 lg:gap-8">
             <header className="flex flex-wrap items-center justify-between gap-3">
               <a
                 className="inline-flex items-center gap-2 text-sm font-black uppercase tracking-[0.24em] text-[var(--page-contrast)]"
@@ -674,18 +843,50 @@ export default function Home() {
             <div id="top" className="max-w-4xl">
               <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-[color:var(--grid-line)] bg-[var(--accent)] px-3 py-1 text-xs font-black uppercase tracking-[0.2em] text-[var(--accent-text)]">
                 <Sparkles className="size-3.5" aria-hidden="true" />
-                Find one useful thing to do next
+                Turn emotional energy into action
               </p>
-              <h1 className="max-w-3xl text-balance text-5xl font-black leading-[0.92] tracking-normal text-[var(--ink)] sm:text-6xl lg:text-7xl">
-                You care. Let&apos;s turn that into a next move.
+              <h1 className="max-w-3xl text-balance text-4xl font-black leading-[0.94] tracking-normal text-[var(--ink)] sm:text-6xl lg:text-7xl">
+                The world feels heavy. Choose one useful next move.
               </h1>
-              <p className="mt-6 max-w-2xl text-lg leading-8 text-[var(--copy)] sm:text-xl">
-                Pick a cause, say what you can offer, and get practical actions
-                that respect your time, money, skills, and attention.
+              <p className="mt-5 max-w-2xl text-base leading-7 text-[var(--copy)] sm:text-xl sm:leading-8">
+                For climate dread, war headlines, local crises, and the long
+                list of things you are told to care about. Start with what you
+                are carrying, then channel it into something real.
               </p>
             </div>
 
-            <div className="grid gap-4 rounded-[2rem] border border-[color:var(--grid-line)] bg-[var(--soft)] p-4 shadow-[var(--shadow)] backdrop-blur sm:p-5">
+            <div className="grid min-w-0 gap-4 rounded-[2rem] border border-[color:var(--grid-line)] bg-[var(--soft)] p-4 shadow-[var(--shadow)] backdrop-blur sm:p-5">
+              <div>
+                <p className="text-sm font-black uppercase tracking-[0.18em] text-[var(--muted)]">
+                  What are you carrying?
+                </p>
+                <div className="-mx-1 mt-3 flex min-w-0 gap-2 overflow-x-auto px-1 pb-1 lg:grid lg:grid-cols-5 lg:overflow-visible">
+                  {energyOptions.map((energy) => {
+                    const Icon = energy.icon;
+                    const isSelected = selectedEnergy === energy.id;
+
+                    return (
+                      <button
+                        className={`min-w-40 rounded-2xl border p-3 text-left transition lg:min-w-0 ${
+                          isSelected
+                            ? "border-[color:var(--primary)] bg-[var(--primary)] text-[var(--primary-text)]"
+                            : "border-[color:var(--grid-line)] bg-[var(--control-muted)] text-[var(--copy)] hover:bg-[var(--control)]"
+                        }`}
+                        key={energy.id}
+                        onClick={() => setSelectedEnergy(energy.id)}
+                        type="button"
+                      >
+                        <Icon className="mb-2 size-5" aria-hidden="true" />
+                        <span className="block text-sm font-black">{energy.label}</span>
+                        <span className="mt-1 block text-xs font-bold opacity-75">
+                          {energy.description}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
               <label className="text-sm font-black uppercase tracking-[0.18em] text-[var(--muted)]">
                 What cause is on your mind?
               </label>
@@ -695,12 +896,12 @@ export default function Home() {
                   className="h-12 w-full bg-transparent text-lg font-bold text-[var(--page-contrast)] outline-none placeholder:text-[var(--muted)]"
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Climate, food access, disaster relief..."
+                  placeholder="Climate, a war, housing, food..."
                   aria-label="Search or enter a cause"
                 />
               </div>
               <div
-                className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 sm:flex-wrap sm:overflow-visible"
+                className="-mx-1 flex min-w-0 gap-2 overflow-x-auto px-1 pb-1 sm:flex-wrap sm:overflow-visible"
                 aria-label="Starter causes"
               >
                 {causes.map((cause) => {
@@ -737,7 +938,7 @@ export default function Home() {
                   Action finder
                 </p>
                 <h2 className="mt-2 text-2xl font-black tracking-normal">
-                  What can you offer?
+                  Give the feeling a job.
                 </h2>
               </div>
               <div className="grid size-12 place-items-center rounded-full bg-[var(--accent)] text-[var(--accent-text)]">
@@ -745,6 +946,37 @@ export default function Home() {
               </div>
             </div>
 
+            <div className="mb-5">
+              <p className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-[var(--muted)]">
+                What would help today?
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {goalOptions.map((goal) => {
+                  const Icon = goal.icon;
+                  const isSelected = selectedGoal === goal.id;
+
+                  return (
+                    <button
+                      className={`min-h-14 rounded-2xl border p-3 text-left transition ${
+                        isSelected
+                          ? "border-[color:var(--accent)] bg-[var(--accent)] text-[var(--accent-text)]"
+                          : "border-[color:var(--grid-line)] bg-[var(--primary-soft)] text-[var(--primary-text)] hover:bg-[var(--control-muted)]"
+                      }`}
+                      key={goal.id}
+                      onClick={() => setSelectedGoal(goal.id)}
+                      type="button"
+                    >
+                      <Icon className="mb-2 size-4" aria-hidden="true" />
+                      <span className="block text-sm font-black">{goal.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <p className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-[var(--muted)]">
+              What can you offer?
+            </p>
             <div className="grid grid-cols-2 gap-2">
               {offerOptions.map((offer) => {
                 const Icon = offer.icon;
@@ -808,9 +1040,19 @@ export default function Home() {
                   {selectedCause.summary}
                 </p>
               </div>
-              <div className="inline-flex w-fit items-center gap-2 rounded-full bg-[var(--panel-tint)] px-3 py-2 text-sm font-black text-[var(--page-contrast)]">
-                <CheckCircle2 className="size-4" aria-hidden="true" />
-                {filteredActions.length} useful option{filteredActions.length === 1 ? "" : "s"}
+              <div className="flex flex-wrap gap-2">
+                <div className="inline-flex w-fit items-center gap-2 rounded-full bg-[var(--primary)] px-3 py-2 text-sm font-black text-[var(--primary-text)]">
+                  <HeartPulse className="size-4" aria-hidden="true" />
+                  Carrying: {selectedEnergyOption.label}
+                </div>
+                <div className="inline-flex w-fit items-center gap-2 rounded-full bg-[var(--accent)] px-3 py-2 text-sm font-black text-[var(--accent-text)]">
+                  <CheckCircle2 className="size-4" aria-hidden="true" />
+                  Goal: {selectedGoalLabel}
+                </div>
+                <div className="inline-flex w-fit items-center gap-2 rounded-full bg-[var(--panel-tint)] px-3 py-2 text-sm font-black text-[var(--page-contrast)]">
+                  <CheckCircle2 className="size-4" aria-hidden="true" />
+                  {filteredActions.length} useful option{filteredActions.length === 1 ? "" : "s"}
+                </div>
               </div>
             </div>
 
@@ -829,6 +1071,9 @@ export default function Home() {
               <h3 className="text-2xl font-black tracking-normal">{recommendedAction.title}</h3>
               <p className="mt-3 max-w-2xl text-base leading-7">
                 {recommendedAction.why}
+              </p>
+              <p className="mt-3 max-w-2xl rounded-2xl bg-[var(--accent-panel)] px-4 py-3 text-sm font-black leading-6">
+                When you feel {selectedEnergyOption.label.toLowerCase()}, this is a good-sized way to start: {selectedEnergyOption.description.toLowerCase()}
               </p>
               <div className="mt-4 rounded-2xl bg-[var(--accent-panel)] p-4">
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-[var(--muted)]">

@@ -7,7 +7,10 @@ The product is intentionally lightweight: no accounts, no database, no live nonp
 ## Features
 
 - Cause search with curated starter causes
+- Starter path for war and humanitarian crises, alongside climate, food, housing, health, education, civic, disaster, and community care topics
 - Custom-cause fallback for topics outside the starter list
+- Emotional-state intake that helps channel overwhelm, anger, urgency, or grief into appropriately sized actions
+- Goal setting for learning, donating, volunteering, advocacy, skill help, or habit-building
 - Filters for available capacity: time, money, skills, local presence, social reach, or uncertainty
 - Effort filters for 10-minute, 1-hour, weekend, and ongoing actions
 - Recommended “best next step” plus grouped action cards
