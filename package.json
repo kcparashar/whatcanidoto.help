@@ -2,6 +2,13 @@
   "name": "whatcanidoto.help",
   "version": "0.1.0",
   "private": true,
+  "description": "A static action finder that helps people choose one useful next step for a cause they care about.",
+  "license": "MPL-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/kcparashar/whatcanidoto.help.git"
+  },
+  "homepage": "https://whatcanidoto.help",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
