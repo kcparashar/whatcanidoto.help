@@ -22,6 +22,9 @@
   --accent-text: #1f241f;
   --accent-panel: rgba(255, 255, 255, 0.82);
   --signal: #e15f41;
+  --action-control-bg: rgba(255, 255, 255, 0.1);
+  --action-control-border: rgba(255, 255, 255, 0.62);
+  --action-control-hover: rgba(255, 255, 255, 0.18);
   --shadow: 0 24px 80px rgba(31, 36, 31, 0.12);
   --heavy-shadow: 6px 6px 0 #1f241f;
 }
@@ -65,6 +68,9 @@ html[data-theme="paper"] body {
   --accent-text: #1f241f;
   --accent-panel: rgba(255, 255, 255, 0.82);
   --signal: #e15f41;
+  --action-control-bg: rgba(255, 255, 255, 0.1);
+  --action-control-border: rgba(255, 255, 255, 0.62);
+  --action-control-hover: rgba(255, 255, 255, 0.18);
   --shadow: 0 24px 80px rgba(31, 36, 31, 0.12);
   --heavy-shadow: 6px 6px 0 #1f241f;
 }
@@ -95,6 +101,9 @@ html[data-theme="blueprint"] body {
   --accent-text: #031426;
   --accent-panel: rgba(233, 251, 255, 0.82);
   --signal: #8af4ff;
+  --action-control-bg: rgba(126, 223, 255, 0.12);
+  --action-control-border: rgba(126, 223, 255, 0.68);
+  --action-control-hover: rgba(126, 223, 255, 0.2);
   --shadow: 0 24px 90px rgba(0, 0, 0, 0.32);
   --heavy-shadow: 6px 6px 0 #63d9ff;
 }
@@ -107,6 +116,18 @@ html {
   scroll-behavior: smooth;
 }
 
+@media (max-width: 639px) {
+  html[data-theme="paper"],
+  html[data-theme="paper"] body {
+    --heavy-shadow: 4px 4px 0 #1f241f;
+  }
+
+  html[data-theme="blueprint"],
+  html[data-theme="blueprint"] body {
+    --heavy-shadow: 4px 4px 0 #63d9ff;
+  }
+}
+
 button,
 input {
   font: inherit;
@@ -115,6 +136,29 @@ input {
 button,
 a[href] {
   -webkit-tap-highlight-color: transparent;
+}
+
+.action-control {
+  background: var(--action-control-bg);
+  border: 2px solid var(--action-control-border);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.18),
+    0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.action-control:hover {
+  background: var(--action-control-hover);
+  border-color: var(--accent);
+}
+
+.action-control-selected {
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 255, 255, 0.5),
+    0 0 0 1px color-mix(in srgb, var(--accent) 50%, transparent),
+    0 8px 20px rgba(0, 0, 0, 0.18);
+  color: var(--accent-text);
 }
 
 @media (prefers-reduced-motion: no-preference) {

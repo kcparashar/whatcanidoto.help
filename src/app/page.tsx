@@ -803,50 +803,46 @@ export default function Home() {
       className="min-h-screen overflow-x-hidden bg-[var(--page)] text-[var(--page-contrast)] transition-colors duration-300"
       data-theme={resolvedTheme}
     >
-      <button
-        aria-label={`Switch to ${isBlueprint ? "paper" : "blueprint"} theme`}
-        aria-pressed={themePreference !== "system"}
-        className="fixed right-[max(1rem,env(safe-area-inset-right))] top-[max(1rem,env(safe-area-inset-top))] z-50 inline-flex size-11 items-center justify-center gap-2 rounded-full border border-[color:var(--grid-line)] bg-[var(--control-muted)] font-black text-[var(--page-contrast)] shadow-[var(--shadow)] backdrop-blur sm:size-auto sm:px-4 sm:py-2 sm:text-sm"
-        onClick={chooseTheme}
-        title={
-          themePreference === "system"
-            ? `Following system theme: ${isBlueprint ? "blueprint" : "paper"}`
-            : `Saved theme: ${isBlueprint ? "blueprint" : "paper"}`
-        }
-        type="button"
-      >
-        {isBlueprint ? (
-          <Sun className="size-4" aria-hidden="true" />
-        ) : (
-          <Moon className="size-4" aria-hidden="true" />
-        )}
-        <span className="hidden sm:inline">
-          {themePreference === "system" ? "System" : isBlueprint ? "Blueprint" : "Paper"}
-        </span>
-      </button>
-
       <section className="relative overflow-hidden border-b border-[color:var(--grid-line)] [background:var(--hero-gradient)]">
         <div className="absolute inset-0 [background-image:linear-gradient(var(--grid-line)_1px,transparent_1px),linear-gradient(90deg,var(--grid-line)_1px,transparent_1px)] [background-size:36px_36px]" />
         <div className="relative mx-auto grid min-h-[92vh] max-w-7xl gap-6 px-4 py-5 sm:px-6 lg:grid-cols-[minmax(0,0.94fr)_minmax(360px,0.56fr)] lg:gap-8 lg:px-8">
           <div className="flex min-w-0 flex-col justify-between gap-6 lg:gap-8">
-            <header className="flex flex-wrap items-center justify-between gap-3 pr-14 sm:pr-36">
+            <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 sm:flex sm:flex-wrap sm:justify-between">
               <a
-                className="inline-flex items-center gap-2 text-sm font-black uppercase tracking-[0.24em] text-[var(--page-contrast)]"
+                className="inline-flex min-w-0 items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-[var(--page-contrast)] sm:text-sm sm:tracking-[0.24em]"
                 href="#top"
               >
-                <span className="grid size-8 place-items-center rounded-full bg-[var(--primary)] text-[var(--primary-text)]">
+                <span className="grid size-8 shrink-0 place-items-center rounded-full bg-[var(--primary)] text-[var(--primary-text)]">
                   ?
                 </span>
-                whatcanidoto.help
+                <span className="truncate">whatcanidoto.help</span>
               </a>
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="contents sm:flex sm:flex-wrap sm:items-center sm:gap-2">
                 <a
-                  className="inline-flex items-center gap-2 rounded-full border border-[color:var(--grid-line)] bg-[var(--control-muted)] px-4 py-2 text-sm font-bold shadow-sm transition hover:-translate-y-0.5 hover:bg-[var(--control)]"
+                  className="col-span-2 row-start-2 inline-flex w-fit items-center gap-2 rounded-full border border-[color:var(--grid-line)] bg-[var(--control-muted)] px-3 py-2 text-sm font-bold shadow-sm transition hover:-translate-y-0.5 hover:bg-[var(--control)] sm:col-auto sm:row-auto sm:px-4"
                   href="#actions"
                 >
                   See actions
                   <ArrowUpRight className="size-4" aria-hidden="true" />
                 </a>
+                <button
+                  aria-label={`Switch to ${isBlueprint ? "paper" : "blueprint"} theme`}
+                  aria-pressed={themePreference !== "system"}
+                  className="col-start-2 row-start-1 inline-flex size-8 shrink-0 items-center justify-center rounded-full border border-[color:var(--grid-line)] bg-[var(--control-muted)] text-[var(--page-contrast)] hover:bg-[var(--control)] sm:col-auto sm:row-auto"
+                  onClick={chooseTheme}
+                  title={
+                    themePreference === "system"
+                      ? `Following system theme: ${isBlueprint ? "blueprint" : "paper"}`
+                      : `Saved theme: ${isBlueprint ? "blueprint" : "paper"}`
+                  }
+                  type="button"
+                >
+                  {isBlueprint ? (
+                    <Sun className="size-4" aria-hidden="true" />
+                  ) : (
+                    <Moon className="size-4" aria-hidden="true" />
+                  )}
+                </button>
               </div>
             </header>
 
@@ -855,7 +851,7 @@ export default function Home() {
                 <Sparkles className="size-3.5" aria-hidden="true" />
                 Turn emotional energy into action
               </p>
-              <h1 className="max-w-3xl text-balance text-4xl font-black leading-[0.94] tracking-normal text-[var(--ink)] sm:text-6xl lg:text-7xl">
+              <h1 className="max-w-3xl text-balance text-[2.55rem] font-black leading-[0.94] tracking-normal text-[var(--ink)] sm:text-6xl lg:text-7xl">
                 The world feels heavy. Choose one useful next move.
               </h1>
               <p className="mt-5 max-w-2xl text-base leading-7 text-[var(--copy)] sm:text-xl sm:leading-8">
@@ -865,19 +861,19 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="grid min-w-0 gap-4 rounded-[2rem] border border-[color:var(--grid-line)] bg-[var(--soft)] p-4 shadow-[var(--shadow)] backdrop-blur sm:p-5">
+            <div className="grid min-w-0 gap-4 rounded-[1.5rem] border border-[color:var(--grid-line)] bg-[var(--soft)] p-4 shadow-[var(--shadow)] backdrop-blur sm:rounded-[2rem] sm:p-5">
               <div>
                 <p className="text-sm font-black uppercase tracking-[0.18em] text-[var(--muted)]">
                   What are you carrying?
                 </p>
-                <div className="-mx-1 mt-3 flex min-w-0 gap-2 overflow-x-auto px-1 pb-1 lg:grid lg:grid-cols-5 lg:overflow-visible">
+                <div className="mt-3 grid min-w-0 grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
                   {energyOptions.map((energy) => {
                     const Icon = energy.icon;
                     const isSelected = selectedEnergy === energy.id;
 
                     return (
                       <button
-                        className={`min-w-40 rounded-2xl border p-3 text-left transition lg:min-w-0 ${
+                        className={`min-w-0 rounded-2xl border p-3 text-left transition ${
                           isSelected
                             ? "border-[color:var(--primary)] bg-[var(--primary)] text-[var(--primary-text)]"
                             : "border-[color:var(--grid-line)] bg-[var(--control-muted)] text-[var(--copy)] hover:bg-[var(--control)]"
@@ -900,7 +896,7 @@ export default function Home() {
               <label className="text-sm font-black uppercase tracking-[0.18em] text-[var(--muted)]">
                 What cause is on your mind?
               </label>
-              <div className="flex min-h-14 items-center gap-3 rounded-2xl border-2 border-[color:var(--primary)] bg-[var(--control)] px-4 shadow-[var(--heavy-shadow)]">
+              <div className="flex min-h-14 min-w-0 items-center gap-3 rounded-2xl border-2 border-[color:var(--primary)] bg-[var(--control)] px-4 shadow-[var(--heavy-shadow)]">
                 <Search className="size-5 shrink-0 text-[var(--muted)]" aria-hidden="true" />
                 <input
                   className="h-12 w-full bg-transparent text-lg font-bold text-[var(--page-contrast)] outline-none placeholder:text-[var(--muted)]"
@@ -911,7 +907,7 @@ export default function Home() {
                 />
               </div>
               <div
-                className="-mx-1 flex min-w-0 gap-2 overflow-x-auto px-1 pb-1 sm:flex-wrap sm:overflow-visible"
+                className="flex min-w-0 flex-wrap gap-2"
                 aria-label="Starter causes"
               >
                 {causes.map((cause) => {
@@ -941,7 +937,7 @@ export default function Home() {
             </div>
           </div>
 
-          <aside className="self-end rounded-[2rem] border border-[color:var(--grid-line)] bg-[var(--primary)] p-4 text-[var(--primary-text)] shadow-[var(--shadow)] sm:p-5 lg:mb-4">
+          <aside className="self-end rounded-[1.5rem] border border-[color:var(--grid-line)] bg-[var(--primary)] p-4 text-[var(--primary-text)] shadow-[var(--shadow)] sm:rounded-[2rem] sm:p-5 lg:mb-4">
             <div className="mb-5 flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.22em] text-[var(--accent)]">
@@ -960,17 +956,15 @@ export default function Home() {
               <p className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-[var(--muted)]">
                 What would help today?
               </p>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2">
                 {goalOptions.map((goal) => {
                   const Icon = goal.icon;
                   const isSelected = selectedGoal === goal.id;
 
                   return (
                     <button
-                      className={`min-h-14 rounded-2xl border p-3 text-left transition ${
-                        isSelected
-                          ? "border-[color:var(--accent)] bg-[var(--accent)] text-[var(--accent-text)]"
-                          : "border-[color:var(--grid-line)] bg-[var(--primary-soft)] text-[var(--primary-text)] hover:bg-[var(--control-muted)]"
+                      className={`action-control min-h-14 rounded-2xl p-3 text-left text-[var(--primary-text)] ${
+                        isSelected ? "action-control-selected" : ""
                       }`}
                       key={goal.id}
                       onClick={() => setSelectedGoal(goal.id)}
@@ -987,17 +981,15 @@ export default function Home() {
             <p className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-[var(--muted)]">
               What can you offer?
             </p>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2">
               {offerOptions.map((offer) => {
                 const Icon = offer.icon;
                 const isSelected = selectedOffers.includes(offer.id);
 
                 return (
                   <button
-                    className={`min-h-20 rounded-2xl border p-3 text-left transition ${
-                      isSelected
-                        ? "border-[color:var(--accent)] bg-[var(--accent)] text-[var(--accent-text)]"
-                        : "border-[color:var(--grid-line)] bg-[var(--primary-soft)] text-[var(--primary-text)] hover:bg-[var(--control-muted)]"
+                    className={`action-control min-h-20 rounded-2xl p-3 text-left text-[var(--primary-text)] ${
+                      isSelected ? "action-control-selected" : ""
                     }`}
                     key={offer.id}
                     onClick={() => toggleOffer(offer.id)}
@@ -1017,10 +1009,8 @@ export default function Home() {
               <div className="flex flex-wrap gap-2">
                 {effortOptions.map((effort) => (
                   <button
-                    className={`rounded-full border px-3 py-2 text-sm font-black transition ${
-                      selectedEffort === effort.id
-                        ? "border-[color:var(--primary-text)] bg-[var(--primary-text)] text-[var(--primary)]"
-                        : "border-[color:var(--grid-line)] bg-[var(--primary-soft)] text-[var(--primary-text)] hover:bg-[var(--control-muted)]"
+                    className={`action-control rounded-full px-3 py-2 text-sm font-black text-[var(--primary-text)] ${
+                      selectedEffort === effort.id ? "action-control-selected" : ""
                     }`}
                     key={effort.id}
                     onClick={() => setSelectedEffort(effort.id)}
@@ -1037,13 +1027,13 @@ export default function Home() {
 
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8" id="actions">
         <div className="grid gap-5 lg:grid-cols-[minmax(0,0.72fr)_minmax(320px,0.28fr)]">
-          <div className="rounded-[2rem] border border-[color:var(--grid-line)] bg-[var(--panel)] p-5 shadow-sm sm:p-6">
+          <div className="rounded-[1.5rem] border border-[color:var(--grid-line)] bg-[var(--panel)] p-4 shadow-sm sm:rounded-[2rem] sm:p-6">
             <div className="flex flex-col gap-4 border-b border-[color:var(--grid-line)] pb-5 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <p className="text-sm font-black uppercase tracking-[0.2em] text-[var(--signal)]">
                   Current cause
                 </p>
-                <h2 className="mt-2 text-3xl font-black tracking-normal text-[var(--ink)]">
+                <h2 className="mt-2 text-2xl font-black tracking-normal text-[var(--ink)] sm:text-3xl">
                   {selectedCause.name}
                 </h2>
                 <p className="mt-2 max-w-2xl text-base leading-7 text-[var(--muted)]">
@@ -1066,7 +1056,7 @@ export default function Home() {
               </div>
             </div>
 
-            <article className="my-5 rounded-[1.5rem] border-2 border-[color:var(--primary)] bg-[var(--accent)] p-5 text-[var(--accent-text)] shadow-[var(--heavy-shadow)]">
+            <article className="my-5 rounded-[1.25rem] border-2 border-[color:var(--primary)] bg-[var(--accent)] p-4 text-[var(--accent-text)] shadow-[var(--heavy-shadow)] sm:rounded-[1.5rem] sm:p-5">
               <div className="mb-4 flex flex-wrap items-center gap-2">
                 <span className="rounded-full bg-[var(--primary)] px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-[var(--primary-text)]">
                   Best next step
@@ -1078,14 +1068,14 @@ export default function Home() {
                   {recommendedAction.mode}
                 </span>
               </div>
-              <h3 className="text-2xl font-black tracking-normal">{recommendedAction.title}</h3>
+              <h3 className="text-xl font-black tracking-normal sm:text-2xl">{recommendedAction.title}</h3>
               <p className="mt-3 max-w-2xl text-base leading-7">
                 {recommendedAction.why}
               </p>
               <p className="mt-3 max-w-2xl rounded-2xl bg-[var(--accent-panel)] px-4 py-3 text-sm font-black leading-6">
                 When you feel {selectedEnergyOption.label.toLowerCase()}, this is a good-sized way to start: {selectedEnergyOption.description.toLowerCase()}
               </p>
-              <div className="mt-4 rounded-2xl bg-[var(--accent-panel)] p-4">
+              <div className="mt-4 rounded-2xl bg-[var(--accent-panel)] p-3 sm:p-4">
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-[var(--muted)]">
                   First step
                 </p>
@@ -1111,9 +1101,9 @@ export default function Home() {
           </div>
 
           <aside className="space-y-5">
-            <div className="rounded-[2rem] border border-[color:var(--grid-line)] bg-[var(--panel-tint)] p-5">
+            <div className="rounded-[1.5rem] border border-[color:var(--grid-line)] bg-[var(--panel-tint)] p-4 sm:rounded-[2rem] sm:p-5">
               <ShieldCheck className="size-7 text-[var(--page-contrast)]" aria-hidden="true" />
-              <h2 className="mt-4 text-2xl font-black tracking-normal">Trust check</h2>
+              <h2 className="mt-4 text-xl font-black tracking-normal sm:text-2xl">Trust check</h2>
               <ul className="mt-4 space-y-3 text-sm font-semibold leading-6 text-[var(--copy)]">
                 <li>Use current pages with dates, names, and public contact info.</li>
                 <li>Prefer specific needs over vague urgency.</li>
@@ -1122,9 +1112,9 @@ export default function Home() {
               </ul>
             </div>
 
-            <div className="rounded-[2rem] border border-[color:var(--grid-line)] bg-[var(--panel)] p-5">
+            <div className="rounded-[1.5rem] border border-[color:var(--grid-line)] bg-[var(--panel)] p-4 sm:rounded-[2rem] sm:p-5">
               <BookOpen className="size-7 text-[var(--signal)]" aria-hidden="true" />
-              <h2 className="mt-4 text-2xl font-black tracking-normal">Good help is specific</h2>
+              <h2 className="mt-4 text-xl font-black tracking-normal sm:text-2xl">Good help is specific</h2>
               <p className="mt-3 text-sm font-semibold leading-6 text-[var(--muted)]">
                 The best first message usually names a task, a time limit, and
                 a boundary. Try: I can do two hours of calls, design one flyer,
@@ -1132,9 +1122,9 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="rounded-[2rem] border border-[color:var(--grid-line)] bg-[var(--primary)] p-5 text-[var(--primary-text)]">
+            <div className="rounded-[1.5rem] border border-[color:var(--grid-line)] bg-[var(--primary)] p-4 text-[var(--primary-text)] sm:rounded-[2rem] sm:p-5">
               <Users className="size-7 text-[var(--accent)]" aria-hidden="true" />
-              <h2 className="mt-4 text-2xl font-black tracking-normal">Built for overwhelm</h2>
+              <h2 className="mt-4 text-xl font-black tracking-normal sm:text-2xl">Built for overwhelm</h2>
               <p className="mt-3 text-sm font-semibold leading-6 text-[var(--muted)]">
                 You do not have to do everything. Pick one useful next move,
                 make it real, then come back when you have more capacity.
@@ -1149,7 +1139,7 @@ export default function Home() {
 
 function ActionCard({ action }: { action: Action }) {
   return (
-    <article className="flex min-h-72 flex-col rounded-[1.25rem] border border-[color:var(--grid-line)] bg-[var(--soft)] p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+    <article className="flex flex-col rounded-[1.25rem] border border-[color:var(--grid-line)] bg-[var(--soft)] p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:min-h-72">
       <div className="flex flex-wrap items-center gap-2">
         <span className="rounded-full bg-[var(--primary)] px-2.5 py-1 text-xs font-black text-[var(--primary-text)]">
           {action.kind}
